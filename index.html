@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virtual Chemistry Lab | Freestyle & MIT-WPU CHM10011</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="badge">CHEM-SIM v1.0</span>
+      <h1>Virtual Chemistry Laboratory</h1>
+    </div>
+    <nav class="mode-tabs" role="tablist">
+      <button id="tab-freestyle" class="tab-btn active" data-mode="freestyle">
+        Mode 1: Freestyle (Grades 9–12)
+      </button>
+      <button id="tab-curriculum" class="tab-btn" data-mode="curriculum">
+        Mode 2: MIT-WPU Curriculum (CHM10011)
+      </button>
+    </nav>
+    <button id="btn-reset" class="btn-secondary">Reset Bench</button>
+  </header>
+
+  <main class="lab-grid">
+    <!-- LEFT PANEL: Shelf / Experiment Selector -->
+    <aside class="panel left-panel">
+      <div id="freestyle-shelf">
+        <h2>Chemicals & Apparatus</h2>
+        <div class="shelf-group">
+          <h3>Acids & Bases</h3>
+          <div class="chip-grid" id="shelf-acidbase"></div>
+        </div>
+        <div class="shelf-group">
+          <h3>Salts, Metals & Indicators</h3>
+          <div class="chip-grid" id="shelf-salts"></div>
+        </div>
+        <div class="shelf-group">
+          <h3>Thermal & Stirring Controls</h3>
+          <label class="slider-label">
+            Bunsen Burner Temp: <strong id="temp-display">25 °C</strong>
+            <input type="range" id="temp-slider" min="25" max="250" value="25" />
+          </label>
+          <button id="btn-stir" class="btn-action">Stir Solution</button>
+        </div>
+      </div>
+
+      <div id="curriculum-shelf" class="hidden">
+        <h2>MIT-WPU CHM10011 Manual</h2>
+        <p class="subtext">Select an F.Y. B.Tech experiment:</p>
+        <div id="exp-list" class="exp-list"></div>
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL: Interactive Apparatus Canvas -->
+    <section class="panel center-panel">
+      <div class="bench-header">
+        <h2 id="bench-title">Freestyle Reaction Beaker (250 mL)</h2>
+        <span id="status-pill" class="status-pill">Ready</span>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="lab-canvas" width="540" height="380"></canvas>
+      </div>
+
+      <!-- Dynamic Experiment Controls (Contextual) -->
+      <div id="dynamic-controls" class="dynamic-controls"></div>
+    </section>
+
+    <!-- RIGHT PANEL: Procedure, Live Telemetry & Reaction Log -->
+    <aside class="panel right-panel">
+      <div class="telemetry-grid">
+        <div class="metric-card">
+          <span>Temperature</span>
+          <strong id="metric-temp">25.0 °C</strong>
+        </div>
+        <div class="metric-card">
+          <span>pH Value</span>
+          <strong id="metric-ph">7.00</strong>
+        </div>
+        <div class="metric-card">
+          <span>Volume</span>
+          <strong id="metric-vol">0 mL</strong>
+        </div>
+      </div>
+
+      <div class="procedure-box">
+        <h3 id="proc-heading">Step-by-Step Guide</h3>
+        <ol id="proc-steps" class="proc-list"></ol>
+      </div>
+
+      <div class="log-box">
+        <div class="log-header">
+          <h3>Observation & Reaction Log</h3>
+          <button id="btn-clear-log" class="btn-xs">Clear</button>
+        </div>
+        <div id="reaction-log" class="reaction-log"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
