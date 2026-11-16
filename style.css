@@ -63,7 +63,7 @@ body {
 
 .lab-grid {
   display: grid;
-  grid-template-columns: 280px 1fr 330px;
+  grid-template-columns: 290px 1fr 330px;
   gap: 0.9rem;
   padding: 0.9rem;
   flex: 1;
@@ -81,7 +81,7 @@ body {
 
 h2 { font-size: 0.98rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
 h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 0.4rem; }
-.subtext { font-size: 0.8rem; color: var(--muted); }
+.subtext { font-size: 0.76rem; color: var(--muted); margin-bottom: 0.3rem; }
 .hidden { display: none !important; }
 
 .chip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
@@ -99,8 +99,20 @@ h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; colo
 .chem-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
 .chem-btn small { display: block; color: var(--muted); font-size: 0.68rem; }
 
-.slider-label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.8rem; }
-input[type="range"] { width: 100%; accent-color: var(--accent); }
+.draggable-tool {
+  background: #0369a1;
+  color: #fff;
+  padding: 0.55rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: grab;
+  text-align: center;
+  border: 1px solid #38bdf8;
+  margin-bottom: 0.4rem;
+  user-select: none;
+}
+.draggable-tool:active { cursor: grabbing; }
 
 .btn-action, .btn-secondary, .btn-xs {
   background: var(--accent-dark);
@@ -147,6 +159,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   justify-content: center;
   align-items: center;
   padding: 0.5rem;
+  position: relative;
 }
 canvas { max-width: 100%; height: auto; border-radius: 6px; }
 
@@ -185,7 +198,7 @@ canvas { max-width: 100%; height: auto; border-radius: 6px; }
   font-size: 0.78rem;
   line-height: 1.45;
   color: #cbd5e1;
-  max-height: 185px;
+  max-height: 175px;
   overflow-y: auto;
 }
 .proc-list li { margin-bottom: 0.3rem; }
@@ -196,7 +209,7 @@ canvas { max-width: 100%; height: auto; border-radius: 6px; }
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.55rem;
-  height: 190px;
+  height: 185px;
   overflow-y: auto;
   font-family: Consolas, monospace;
   font-size: 0.74rem;
@@ -206,6 +219,7 @@ canvas { max-width: 100%; height: auto; border-radius: 6px; }
 }
 .log-entry { border-left: 2px solid var(--accent); padding-left: 0.45rem; }
 .log-entry.rxn { border-left-color: var(--success); color: #6ee7b7; }
+.log-entry.warn { border-left-color: var(--warn); color: #fde047; }
 
 @media (max-width: 1024px) {
   .lab-grid { grid-template-columns: 1fr; }
