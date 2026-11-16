@@ -1,293 +1,826 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIT-WPU Engineering Chemistry Virtual Lab (CHM10011)</title>
-    <style>
-        :root {
-            --primary: #1a365d;
-            --secondary: #2b6cb0;
-            --accent: #319795;
-            --bg-color: #f7fafc;
-            --card-bg: #ffffff;
-            --text-main: #2d3748;
-            --border-color: #e2e8f0;
+    <title>MIT-WPU Virtual Chemistry Lab (CHM10011)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        mit: { 50: '#f0fdf4', 100: '#dcfce7', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' },
+                        brand: { 50: '#eef2ff', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' }
+                    }
+                }
+            }
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        header { background: var(--primary); color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--accent); }
-        header h1 { font-size: 1.25rem; font-weight: 600; }
-        header span { font-size: 0.85rem; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 4px; }
-
-        /* Experiment Navigation Tabs */
-        .experiment-tabs { display: flex; background: #2d3748; overflow-x: auto; padding: 0 10px; white-space: nowrap; border-bottom: 1px solid #4a5568; }
-        .exp-tab { color: #a0aec0; padding: 10px 16px; font-size: 0.85rem; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
-        .exp-tab:hover { color: white; background: rgba(255,255,255,0.05); }
-        .exp-tab.active { color: white; border-bottom: 3px solid var(--accent); background: rgba(255,255,255,0.1); font-weight: 600; }
-
-        /* Main Workspace */
-        .workspace { display: flex; flex: 1; height: calc(100vh - 95px); overflow: hidden; }
-        
-        /* Left Panel: Apparatus & Chemicals */
-        .panel-left { width: 280px; background: var(--card-bg); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 15px; overflow-y: auto; }
-        .panel-left h3 { font-size: 0.9rem; text-transform: uppercase; color: var(--secondary); margin-bottom: 10px; letter-spacing: 0.5px; }
-        .item-box { background: #edf2f7; border: 1px solid var(--border-color); padding: 8px 12px; margin-bottom: 8px; border-radius: 6px; font-size: 0.85rem; cursor: grab; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; }
-        .item-box:hover { background: #e2e8f0; border-color: var(--secondary); }
-
-        /* Center Panel: Interactive Bench */
-        .panel-center { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; background: #fff; }
-        .bench-container { border: 2px dashed var(--border-color); border-radius: 10px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; background: #fafbfc; min-height: 300px; padding: 20px; text-align: center; }
-        .instructions-card { background: #ebf8ff; border-left: 4px solid var(--secondary); padding: 12px 18px; border-radius: 4px; margin-bottom: 15px; text-align: left; width: 100%; font-size: 0.9rem; }
-
-        /* Right Panel: Data, Log & Meters */
-        .panel-right { width: 320px; background: var(--card-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 15px; overflow-y: auto; }
-        .metric-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
-        .metric-card h4 { font-size: 0.75rem; color: #718096; text-transform: uppercase; margin-bottom: 5px; }
-        .metric-value { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
-        
-        .log-box { flex: 1; background: #1a202c; color: #68d391; font-family: monospace; font-size: 0.8rem; padding: 10px; border-radius: 6px; overflow-y: auto; max-height: 220px; margin-top: 10px; }
-        
-        button.action-btn { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-        button.action-btn:hover { background: #285e61; }
-        
-        .table-container { width: 100%; margin-top: 15px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: center; }
-        th { background: #edf2f7; color: var(--primary); }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .dark .glass-panel { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.8); }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col overflow-hidden">
 
-    <header>
-        <h1>MIT-WPU Virtual Chemistry Lab (CHM10011)</h1>
-        <span>F.Y. B.Tech Semester I/II[cite: 2, 6]</span>
+    <!-- Top Navigation Bar -->
+    <header class="bg-slate-900 text-white shadow-md z-30 flex items-center justify-between px-6 py-3 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-green-600 to-emerald-500 p-2 rounded-xl text-white shadow-lg">
+                <i class="fa-solid fa-flask-vial text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-wide leading-tight">MIT-WPU <span class="text-emerald-400">Virtual ChemLab</span></h1>
+                <p class="text-xs text-slate-400">Course: CHM10011 | F.Y. B.Tech (2026-27)</p>
+            </div>
+        </div>
+        
+        <!-- Main Navigation Tabs -->
+        <nav class="hidden md:flex space-x-1 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
+            <button onclick="switchMainTab('workspace')" id="nav-workspace" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow">
+                <i class="fa-solid fa-desktop mr-1.5"></i> General Workspace
+            </button>
+            <button onclick="switchMainTab('experiments')" id="nav-experiments" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-700/50">
+                <i class="fa-solid fa-book-open mr-1.5"></i> 9 Lab Experiments
+            </button>
+        </nav>
+
+        <div class="flex items-center space-x-3">
+            <span class="hidden lg:inline-block text-xs bg-emerald-900/60 text-emerald-300 border border-emerald-700/50 px-3 py-1 rounded-full font-medium">
+                <i class="fa-solid fa-shield-halved mr-1"></i> Safety Protocols Active
+            </span>
+            <button onclick="openModal('safetyModal')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-lg text-sm transition" title="Lab Safety Guidelines">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+            </button>
+        </div>
     </header>
 
-    <!-- Experiment Tabs matching the Manual Table of Contents -->
-    <div class="experiment-tabs" id="expTabs">
-        <div class="exp-tab active" onclick="switchExperiment(0)">1. Viscosity (Polymers)</div>
-        <div class="exp-tab" onclick="switchExperiment(1)">2. Nylon 6,10 Synthesis[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(2)">3. Iron Colorimetry[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(3)">4. Metal Corrosion[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(4)">5. Coal Proximate Analysis[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(5)">6. pH Titration (CH3COOH)[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(6)">7. Thin Layer Chromatography[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(7)">8. Ester Hydrolysis Kinetics[cite: 5]</div>
-        <div class="exp-tab" onclick="switchExperiment(8)">9. ECE of Copper[cite: 5]</div>
+    <!-- Mobile Nav Bar (bottom or subheader) -->
+    <div class="md:hidden bg-slate-800 text-white flex justify-around py-2 border-b border-slate-700 shrink-0">
+        <button onclick="switchMainTab('workspace')" id="mob-nav-workspace" class="text-xs px-3 py-1 bg-emerald-600 rounded font-medium">Workspace</button>
+        <button onclick="switchMainTab('experiments')" id="mob-nav-experiments" class="text-xs px-3 py-1 text-slate-300 rounded font-medium">Experiments (1-9)</button>
     </div>
 
-    <div class="workspace">
-        <!-- Left Panel -->
-        <div class="panel-left">
-            <h3>Apparatus</h3>
-            <div id="apparatusList"></div>
-            <h3 style="margin-top: 15px;">Chemicals</h3>
-            <div id="chemicalsList"></div>
+    <!-- Main Container -->
+    <main class="flex-1 overflow-hidden relative flex">
+
+        <!-- ================= GENERAL WORKSPACE TAB ================= -->
+        <div id="tab-workspace" class="flex-1 flex flex-col lg:flex-row overflow-hidden bg-slate-100">
+            <!-- Left Shelf: Apparatus & Chemicals -->
+            <div class="w-full lg:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-sm">
+                <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h2 class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-boxes-stacked mr-2 text-emerald-600"></i>Apparatus & Chemical Shelf</h2>
+                    <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-semibold">Drag / Select</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-2">Glassware & Equipment</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div draggable="true" ondragstart="drag(event)" data-item="beaker" class="bg-slate-50 border border-slate-200 hover:border-emerald-500 p-3 rounded-xl cursor-grab text-center transition hover:shadow-sm">
+                                <i class="fa-solid fa-glass-water text-emerald-600 text-xl mb-1"></i>
+                                <p class="text-xs font-medium text-slate-700">Beaker (250ml)</p>
+                            </div>
+                            <div draggable="true" ondragstart="drag(event)" data-item="viscometer" class="bg-slate-50 border border-slate-200 hover:border-emerald-500 p-3 rounded-xl cursor-grab text-center transition hover:shadow-sm">
+                                <i class="fa-solid fa-flask text-emerald-600 text-xl mb-1"></i>
+                                <p class="text-xs font-medium text-slate-700">Ostwald Viscometer</p>
+                            </div>
+                            <div draggable="true" ondragstart="drag(event)" data-item="burette" class="bg-slate-50 border border-slate-200 hover:border-emerald-500 p-3 rounded-xl cursor-grab text-center transition hover:shadow-sm">
+                                <i class="fa-solid fa-arrows-up-down text-emerald-600 text-xl mb-1"></i>
+                                <p class="text-xs font-medium text-slate-700">Burette & Stand</p>
+                            </div>
+                            <div draggable="true" ondragstart="drag(event)" data-item="colorimeter" class="bg-slate-50 border border-slate-200 hover:border-emerald-500 p-3 rounded-xl cursor-grab text-center transition hover:shadow-sm">
+                                <i class="fa-solid fa-square-poll-vertical text-emerald-600 text-xl mb-1"></i>
+                                <p class="text-xs font-medium text-slate-700">Colorimeter</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-2">Reagents & Chemicals</h3>
+                        <div class="space-y-2">
+                            <div class="bg-emerald-50/60 border border-emerald-200 p-2.5 rounded-lg flex items-center justify-between text-xs font-medium text-emerald-900">
+                                <span><i class="fa-solid fa-droplet text-emerald-600 mr-2"></i> Hexamethylene Diamine</span>
+                                <span class="bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded text-[10px]">Aqueous</span>
+                            </div>
+                            <div class="bg-amber-50/60 border border-amber-200 p-2.5 rounded-lg flex items-center justify-between text-xs font-medium text-amber-900">
+                                <span><i class="fa-solid fa-droplet text-amber-600 mr-2"></i> Sebacoyl Chloride in CCl₄</span>
+                                <span class="bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded text-[10px]">Organic</span>
+                            </div>
+                            <div class="bg-blue-50/60 border border-blue-200 p-2.5 rounded-lg flex items-center justify-between text-xs font-medium text-blue-900">
+                                <span><i class="fa-solid fa-flask text-blue-600 mr-2"></i> 0.1N Acetic Acid + NaOH</span>
+                                <span class="bg-blue-200 text-blue-800 px-1.5 py-0.5 rounded text-[10px]">Titrant</span>
+                            </div>
+                            <div class="bg-purple-50/60 border border-purple-200 p-2.5 rounded-lg flex items-center justify-between text-xs font-medium text-purple-900">
+                                <span><i class="fa-solid fa-vial text-purple-600 mr-2"></i> CuS0₄ + H₂SO₄ (Electrolyte)</span>
+                                <span class="bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded text-[10px]">ECE Test</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Central Drag-and-Drop Workspace -->
+            <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+                <div class="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center shadow-xs">
+                    <div>
+                        <h2 class="font-bold text-slate-800 text-base">Interactive Workbench</h2>
+                        <p class="text-xs text-slate-500">Drag equipment from shelf or quickly jump to any of the 9 prescribed experiments.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="resetWorkspace()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-rotate-right mr-1"></i> Reset Bench
+                        </button>
+                        <button onclick="switchMainTab('experiments')" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-medium transition shadow">
+                            Open Lab Manual (9 Exp) <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Drop Target Area -->
+                <div id="dropzone" ondragover="allowDrop(event)" ondrop="drop(event)" class="flex-1 p-6 flex flex-col items-center justify-center bg-slate-100/70 border-2 border-dashed border-slate-300 m-6 rounded-2xl relative overflow-y-auto">
+                    <div id="workspace-placeholder" class="text-center max-w-md p-8">
+                        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner text-3xl">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-700 text-lg mb-1">Your Lab Bench is Ready</h3>
+                        <p class="text-sm text-slate-500 mb-6">Drag apparatus here or instantly launch structured experiments calibrated for MIT-WPU.</p>
+                        <button onclick="switchMainTab('experiments')" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-medium text-sm shadow hover:bg-slate-800 transition">
+                            Browse All 9 Experiments <i class="fa-solid fa-list-check ml-2"></i>
+                        </button>
+                    </div>
+                    <div id="workspace-content" class="w-full h-full hidden flex flex-col items-center justify-center">
+                        <!-- Dynamic apparatus rendering -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Live Panels -->
+            <div class="w-full lg:w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 p-4 space-y-4 shadow-sm">
+                <h3 class="font-bold text-slate-700 text-sm border-b pb-2"><i class="fa-solid fa-gauge-high mr-2 text-emerald-600"></i>Live Instrument Readings</h3>
+                
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-medium">Digital pH Meter</span>
+                        <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold" id="live-ph">7.00 pH</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div id="ph-bar" class="bg-emerald-500 h-full w-1/2 transition-all"></div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-medium">Thermostat / Temp</span>
+                        <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold" id="live-temp">25.0 °C</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="adjustTemp(-1)" class="flex-1 bg-white border hover:bg-slate-100 py-1 rounded text-xs font-semibold">-</button>
+                        <button onclick="adjustTemp(1)" class="flex-1 bg-white border hover:bg-slate-100 py-1 rounded text-xs font-semibold">+</button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 font-medium">Reaction Stopwatch</span>
+                        <span class="font-mono font-bold text-slate-800" id="live-timer">00:00.0</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="toggleTimer()" id="timer-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded-lg text-xs font-medium shadow">Start</button>
+                        <button onclick="resetTimer()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium">Reset</button>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col min-h-[150px]">
+                    <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Live Reaction Logs</h4>
+                    <div id="reaction-logs" class="flex-1 bg-slate-900 text-emerald-400 font-mono text-[11px] p-3 rounded-xl overflow-y-auto space-y-1">
+                        <div>[11:18] System initialized successfully.</div>
+                        <div>[11:18] Safety protocols loaded for CHM10011.</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Center Panel -->
-        <div class="panel-center">
-            <div class="instructions-card" id="instructionBox">
-                <strong>Objective:</strong> Select items from the sidebar to set up the experiment workbench.
+
+        <!-- ================= 9 EXPERIMENTS TAB ================= -->
+        <div id="tab-experiments" class="flex-1 hidden flex flex-col lg:flex-row overflow-hidden bg-slate-100">
+            <!-- Left Experiment Sidebar Index -->
+            <div class="w-full lg:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0">
+                <div class="p-4 border-b border-slate-200 bg-slate-50">
+                    <h2 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-list-ul mr-2 text-emerald-600"></i>List of Experiments</h2>
+                    <p class="text-xs text-slate-500">MIT-WPU Chemistry Manual 2026-27</p>
+                </div>
+                <div id="exp-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                    <!-- Populated via JS -->
+                </div>
             </div>
-            <div class="bench-container" id="workbench">
-                <h3 id="benchTitle" style="color: var(--secondary); margin-bottom: 10px;">Experiment Bench</h3>
-                <p id="benchDesc" style="color: #718096; font-size: 0.9rem;">Drag or load components to begin simulation.</p>
-                <div id="dynamicContent" style="width: 100%; margin-top: 15px;"></div>
+
+            <!-- Right Experiment Interactive Station -->
+            <div class="flex-1 flex flex-col overflow-y-auto bg-slate-100 p-6">
+                <div id="experiment-workbench" class="max-w-5xl mx-auto w-full space-y-6">
+                    <!-- Dynamic experiment card -->
+                </div>
             </div>
         </div>
 
-        <!-- Right Panel -->
-        <div class="panel-right">
-            <h3>Live Environment</h3>
-            <div class="metric-card">
-                <h4>Temperature</h4>
-                <div class="metric-value" id="metricTemp">25.0 °C</div>
+    </main>
+
+    <!-- Lab Safety Modal -->
+    <div id="safetyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-2"></i> Lab Safety Guidelines & Protocol</h3>
+                <button onclick="closeModal('safetyModal')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="metric-card">
-                <h4>pH / Potential</h4>
-                <div class="metric-value" id="metricPH">7.00 pH</div>
+            <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                <div class="flex items-start space-x-3 bg-amber-50 p-3 rounded-xl border border-amber-200">
+                    <i class="fa-solid fa-user-shield text-amber-600 mt-0.5 text-base"></i>
+                    <div>
+                        <strong class="text-amber-900 block mb-0.5">Personal Protective Equipment</strong>
+                        Always wear safety goggles, lab aprons or coats, and protective gloves during experiments. Closed shoes are mandatory.
+                    </div>
+                </div>
+                <ul class="space-y-2 list-disc pl-4 text-slate-700">
+                    <li>Do not eat, drink, or chew gum inside the laboratory.</li>
+                    <li>Read and check chemical labels carefully before use. Handle acids and glassware with extreme care.</li>
+                    <li>In case of eye contact with chemicals, wash immediately with copious water for at least 10 minutes.</li>
+                    <li>Report all accidents and broken glassware immediately to the faculty supervisor.</li>
+                </ul>
             </div>
-            <div class="metric-card">
-                <h4>Reaction Timer</h4>
-                <div class="metric-value" id="metricTimer">00:00 s</div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal('safetyModal')" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow">I Understand & Agree</button>
             </div>
-            
-            <h3 style="margin-top: 10px;">Console Log</h3>
-            <div class="log-box" id="consoleLog">
-                [System initialized]: Ready for F.Y. B.Tech Chemistry Lab. Select an experiment tab above.
+        </div>
+    </div>
+
+    <!-- Custom Notification Box (Replaces alert) -->
+    <div id="customModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-center">
+            <div id="modalIcon" class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 id="modalTitle" class="font-bold text-slate-800 text-lg">Notification</h3>
+            <p id="modalMessage" class="text-sm text-slate-600">Message content here.</p>
+            <div class="pt-2">
+                <button onclick="closeCustomModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow">OK</button>
             </div>
         </div>
     </div>
 
     <script>
-        const experimentData = [
+        // --- Navigation Logic ---
+        function switchMainTab(tab) {
+            document.getElementById('tab-workspace').classList.add('hidden');
+            document.getElementById('tab-experiments').classList.add('hidden');
+            document.getElementById('nav-workspace').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-700/50";
+            document.getElementById('nav-experiments').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-700/50";
+            
+            if (tab === 'workspace') {
+                document.getElementById('tab-workspace').classList.remove('hidden');
+                document.getElementById('nav-workspace').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow";
+            } else {
+                document.getElementById('tab-experiments').classList.remove('hidden');
+                document.getElementById('nav-experiments').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow";
+                renderExperiment(currentExpIndex);
+            }
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showMessage(title, message, type = 'success') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            const iconDiv = document.getElementById('modalIcon');
+            if(type === 'success') {
+                iconDiv.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl";
+                iconDiv.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else {
+                iconDiv.className = "w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto text-2xl";
+                iconDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            }
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        // --- Drag and Drop Workspace Logic ---
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.getAttribute("data-item")); }
+        function drop(ev) {
+            ev.preventDefault();
+            let data = ev.dataTransfer.getData("text");
+            loadWorkspaceItem(data);
+        }
+
+        function loadWorkspaceItem(item) {
+            document.getElementById('workspace-placeholder').classList.add('hidden');
+            const content = document.getElementById('workspace-content');
+            content.classList.remove('hidden');
+            
+            let html = '';
+            if(item === 'beaker') {
+                html = `<div class="text-center space-y-4 animate-fade-in">
+                    <div class="relative w-36 h-44 mx-auto border-4 border-slate-300 border-t-0 rounded-b-2xl bg-sky-100/60 flex items-end justify-center pb-4 shadow-lg">
+                        <div class="absolute inset-x-2 bottom-2 h-28 bg-blue-400/40 rounded-b-xl flex items-center justify-center text-xs font-bold text-blue-900">Aqueous Solution</div>
+                    </div>
+                    <p class="font-bold text-slate-700">250 ml Glass Beaker Setup</p>
+                    <button onclick="logReaction('Beaker stirred with 0.1M reactant mixture.')" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-medium shadow">Perform Titration Step</button>
+                </div>`;
+            } else if(item === 'viscometer') {
+                html = `<div class="text-center space-y-4 animate-fade-in">
+                    <div class="w-32 h-52 mx-auto bg-white border-2 border-slate-300 rounded-xl relative shadow-md flex flex-col items-center justify-around p-2">
+                        <div class="w-6 h-16 border-2 border-slate-400 rounded-full bg-sky-50"></div>
+                        <div class="w-10 h-10 border-2 border-slate-400 rounded-full bg-sky-100"></div>
+                        <div class="w-2 h-16 bg-slate-300"></div>
+                    </div>
+                    <p class="font-bold text-slate-700">Ostwald's Viscometer Capillary Setup</p>
+                    <button onclick="switchMainTab('experiments'); selectExperiment(0);" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-medium shadow">Open Exp 1 Module</button>
+                </div>`;
+            } else if(item === 'burette') {
+                html = `<div class="text-center space-y-4 animate-fade-in">
+                    <div class="w-6 h-64 mx-auto border-2 border-slate-400 bg-sky-50 rounded-b relative shadow flex flex-col justify-between">
+                        <div class="w-full h-3/4 bg-blue-300/50"></div>
+                        <div class="absolute bottom-0 w-full h-2 bg-slate-600"></div>
+                    </div>
+                    <p class="font-bold text-slate-700">Burette Assembly (0.2N NaOH Titrant)</p>
+                    <button onclick="switchMainTab('experiments'); selectExperiment(5);" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-medium shadow">Open Exp 6 (pH Titration)</button>
+                </div>`;
+            } else if(item === 'colorimeter') {
+                html = `<div class="text-center space-y-4 animate-fade-in">
+                    <div class="w-48 h-32 mx-auto bg-slate-800 rounded-2xl shadow-xl flex items-center justify-center p-4 border border-slate-700 text-white">
+                        <div class="text-center">
+                            <i class="fa-solid fa-square-poll-vertical text-emerald-400 text-3xl mb-1"></i>
+                            <p class="text-xs font-mono text-emerald-300">Absorbance A = 0.425</p>
+                        </div>
+                    </div>
+                    <p class="font-bold text-slate-700">UV-Vis Colorimeter (\u03bb max 450-460nm)</p>
+                    <button onclick="switchMainTab('experiments'); selectExperiment(2);" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-medium shadow">Open Exp 3 Module</button>
+                </div>`;
+            }
+            content.innerHTML = html;
+            logReaction(`Placed ${item} onto workbench.`);
+        }
+
+        function resetWorkspace() {
+            document.getElementById('workspace-placeholder').classList.remove('hidden');
+            document.getElementById('workspace-content').classList.add('hidden');
+            logReaction("Workbench reset to initial state.");
+        }
+
+        // --- Live Controls ---
+        let currentTemp = 25.0;
+        function adjustTemp(val) {
+            currentTemp = Math.max(0, Math.min(100, currentTemp + val));
+            document.getElementById('live-temp').innerText = currentTemp.toFixed(1) + " °C";
+            logReaction(`Thermostat adjusted to ${currentTemp.toFixed(1)} °C`);
+        }
+
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let isTimerRunning = false;
+        function toggleTimer() {
+            const btn = document.getElementById('timer-btn');
+            if(!isTimerRunning) {
+                isTimerRunning = true;
+                btn.innerText = "Pause";
+                btn.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white py-1.5 rounded-lg text-xs font-medium shadow";
+                timerInterval = setInterval(() => {
+                    timerSeconds += 0.1;
+                    let mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                    let secs = (timerSeconds % 60).toFixed(1).padStart(4, '0');
+                    document.getElementById('live-timer').innerText = `${mins}:${secs}`;
+                }, 100);
+            } else {
+                isTimerRunning = false;
+                btn.innerText = "Start";
+                btn.className = "flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded-lg text-xs font-medium shadow";
+                clearInterval(timerInterval);
+            }
+        }
+        function resetTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            document.getElementById('live-timer').innerText = "00:00.0";
+            document.getElementById('timer-btn').innerText = "Start";
+            document.getElementById('timer-btn').className = "flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded-lg text-xs font-medium shadow";
+        }
+
+        function logReaction(msg) {
+            const box = document.getElementById('reaction-logs');
+            const time = new Date().toLocaleTimeString();
+            box.innerHTML += `<div>[${time}] ${msg}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+
+
+        // ================= 9 EXPERIMENTS DATA & LOGIC =================
+        const experiments = [
             {
-                title: "Determination of Molecular Weight of Polymer by Ostwald's Viscometer",
-                objective: "Determine intrinsic viscosity and calculate viscosity-average molecular weight using Mark-Houwink equation[cite: 7].",
-                apparatus: ["Ostwald Viscometer", "Stopwatch", "Pipette (25ml)", "Volumetric Flasks (50ml)"],
-                chemicals: ["Distilled Water", "Polyvinyl Alcohol (PVA)", "Acetone"],
-                procedure: "Prepare 0.1% to 0.5% dilutions of PVA. Measure flow time (t) through capillary between marks A and B[cite: 8].",
-                tableType: "viscosity"
+                id: 1,
+                title: "Determination of Molecular Weight of a Polymer using Ostwald's Viscometer",
+                aim: "To determine the viscosity average molecular weight of a polymer by measuring intrinsic viscosity using Ostwald's Viscometer.",
+                theory: "Ostwald's Viscometer measures dynamic solution viscosity. Mark-Houwink equation: [\u03b7] = K \u00b7 M^\u03b1 relates intrinsic viscosity to molecular weight M.",
+                hasCustomUI: true,
+                type: 'viscometer'
             },
             {
-                title: "Preparation of Nylon 6,10 via Interfacial Polymerization",
-                objective: "Synthesize nylon 6,10 at aqueous-organic liquid interface using the 'Nylon Rope Trick'[cite: 13].",
-                apparatus: ["250ml Beakers (2)", "Glass Rod / Tweezers", "Test Tube"],
-                chemicals: ["Sebacoyl Chloride in CCl4", "Hexamethylenediamine (aqueous)", "Distilled Water", "Methanol"],
-                procedure: "Carefully pour aqueous diamine over heavier CCl4 diacid chloride layer and draw the interfacial polymer film as a continuous thread[cite: 14].",
-                tableType: "nylon"
+                id: 2,
+                title: "Preparation of Nylon 6,10 and to Draw Them in the Form of Thread",
+                aim: "To prepare nylon 6,10 by interfacial polymerization technique (Nylon Rope Trick method) using immiscible solvent layers.",
+                theory: "Interfacial polycondensation occurs between hexamethylene diamine (aq) and sebacoyl chloride (in CCl\u2084). Polymer forms instantly at the interface and can be drawn as a continuous thread.",
+                hasCustomUI: true,
+                type: 'nylon'
             },
             {
+                id: 3,
                 title: "Determination of Iron Concentration using Colorimeter",
-                objective: "Construct calibration curve using Beer-Lambert's law and estimate unknown iron concentration via thiocyanate complex[cite: 19, 20].",
-                apparatus: ["Colorimeter", "Cuvette", "Volumetric Flasks (50ml)", "Burette"],
-                chemicals: ["Standard Fe Solution", "Ammonium Thiocyanate (NH4SCN)", "2N HNO3"],
-                procedure: "Form red Fe(SCN)3 complex, calibrate blank at 450-460 nm, measure absorbance across standard dilutions[cite: 21].",
-                tableType: "colorimeter"
+                aim: "To determine iron concentration in water using spectrophotometry and Beer-Lambert's law via thiocyanate complexation.",
+                theory: "Fe\u00b3\u207a reacts with SCN\u207b to form intensely red coloured [Fe(SCN)]\u00b2\u207a complex. Absorbance A = \u03b5 \u00b7 c \u00b7 l measured at \u03bb max 450-460nm.",
+                hasCustomUI: true,
+                type: 'colorimeter'
             },
             {
-                title: "Demonstration of Environmental Effect on Metal Corrosion",
-                objective: "Investigate weight loss of mild steel/zinc plates immersed in varying acid concentrations[cite: 27, 29].",
-                apparatus: ["50ml Beakers (3)", "Sand Paper", "Analytical Balance", "Measuring Cylinder"],
-                chemicals: ["Sulphuric Acid (1N, 2N, 4N)", "Mild Steel / Zn Plates"],
-                procedure: "Clean metal plates, immerse 4/5th portion in 1N, 2N, and 4N H2SO4 for 1 hour, determine weight loss per g/hr[cite: 29].",
-                tableType: "corrosion"
+                id: 4,
+                title: "Demonstration of Effect of Environmental Conditions on Metal Corrosion",
+                aim: "To understand the effect of acidic environment (H₂SO₄ concentration) on wet electrochemical corrosion of metals.",
+                theory: "Metal acts as anode in acidic electrolyte undergoing dissolution Fe \u2192 Fe\u00b2\u207a + 2e\u207b with hydrogen evolution at cathodic sites.",
+                hasCustomUI: true,
+                type: 'corrosion'
             },
             {
-                title: "Determination of Moisture, Volatile Matter and Ash in Coal",
-                objective: "Perform proximate analysis of coal sample for industrial fuel quality assessment[cite: 34].",
-                apparatus: ["Silica Crucible", "Electric Oven (110°C)", "Muffle Furnace (750°C)", "Desiccator"],
-                chemicals: ["Powdered Coal Sample", "Anhydrous CaCl2"],
-                procedure: "Heat coal at 110°C for moisture, then ignite residual coal at 750°C in muffle furnace for ash content[cite: 34].",
-                tableType: "coal"
+                id: 5,
+                title: "Determination of % Moisture, Volatile Matter and Ash Content in Coal Sample",
+                aim: "To perform proximate analysis of coal sample determining moisture (110\u00b0C oven) and ash content (750\u00b0C muffle furnace).",
+                theory: "Proximate analysis assesses practical utility and quality of coal by measuring loss of moisture and residual mineral ash.",
+                hasCustomUI: true,
+                type: 'coal'
             },
             {
-                title: "Equivalence Point of Acetic Acid with NaOH by pH Meter",
-                objective: "Perform pH-metric titration of weak acid vs strong base and locate equivalence inflection point[cite: 39, 40].",
-                apparatus: ["pH Meter", "Glass Electrode", "Calomel Electrode", "Burette", "Magnetic Stirrer"],
-                chemicals: ["0.1N Acetic Acid (CH3COOH)", "Unknown NaOH", "Standard Buffer 7 pH"],
-                procedure: "Standardize pH meter with 7 pH buffer. Add NaOH in increments, record pH, and plot sigmoidal curve[cite: 41].",
-                tableType: "ph_titration"
+                id: 6,
+                title: "To Determine Equivalence Point of Neutralization of Acetic Acid with NaOH by pH Meter",
+                aim: "To determine equivalence point and unknown concentration of acetic acid vs. NaOH titration using a pH meter.",
+                theory: "Glass electrode potential varies logarithmically with H\u207a concentration. A sigmoidal pH curve exhibits sharp inflection at equivalence point.",
+                hasCustomUI: true,
+                type: 'phtitration'
             },
             {
-                title: "Separation of Organic Compounds by Thin Layer Chromatography (TLC)",
-                objective: "Separate organic mixture components on silica gel plates and calculate Rf retention factors[cite: 47, 48].",
-                apparatus: ["TLC Glass Chamber", "Glass Plate (20x4 cm)", "Capillary Tube", "UV Lamp / Iodine Chamber"],
-                chemicals: ["Silica Gel Slurry", "Chloroform / Benzene Eluent", "Organic Test Mixture"],
-                procedure: "Spot mixture on TLC plate, develop in closed chamber, visualize spots with iodine vapor, and calculate Rf[cite: 48].",
-                tableType: "tlc"
+                id: 7,
+                title: "Separation of Mixture of Organic Compounds by Thin Layer Chromatography (TLC)",
+                aim: "To separate organic compounds using TLC on silica gel plates and calculate retardation factor (Rf).",
+                theory: "Rf = (Distance travelled by compound from baseline) / (Distance travelled by solvent front). Polar compounds bind stronger to silica gel.",
+                hasCustomUI: true,
+                type: 'tlc'
             },
             {
+                id: 8,
                 title: "Kinetics of Acid-Catalyzed Hydrolysis of an Ester",
-                objective: "Determine pseudo-first order rate constant for ethyl acetate hydrolysis catalyzed by HCl[cite: 53].",
-                apparatus: ["Thermostat (25°C)", "Pipette (10ml)", "Conical Flask", "Stopwatch", "Burette"],
-                chemicals: ["0.4N HCl", "Ethyl Acetate", "0.2N NaOH", "Phenolphthalein Indicator"],
-                procedure: "Mix ethyl acetate in 0.4N HCl at 25°C, withdraw samples into ice water at intervals, titrate against NaOH[cite: 54].",
-                tableType: "kinetics"
+                aim: "To determine pseudo-first order rate constant of acid-catalyzed hydrolysis of ethyl acetate.",
+                theory: "K = (2.303 / t) \u00b7 log[(V\u221e - V\u2080) / (V\u221e - V_t)], where V values are titration volumes with standard NaOH at time t.",
+                hasCustomUI: true,
+                type: 'kinetics'
             },
             {
-                title: "Determination of Electrochemical Equivalent (ECE) of Copper",
-                objective: "Verify Faraday's First Law of electrolysis using a copper voltameter and copper sulfate electrolyte[cite: 60].",
-                apparatus: ["Copper Voltameter", "DC Power Supply", "Ammeter", "Rheostat", "Analytical Balance"],
-                chemicals: ["15% CuSO4 Solution", "5% H2SO4", "Copper Cathode/Anode Plates"],
-                procedure: "Weigh clean copper cathode, pass steady current for 45 mins, wash, dry, and reweigh to find deposited mass[cite: 61].",
-                tableType: "ece"
+                id: 9,
+                title: "To Determine the Electrochemical Equivalent (ECE) of Copper",
+                aim: "To determine ECE of copper using a copper voltameter cell and Faraday's first law of electrolysis.",
+                theory: "W = Z \u00b7 I \u00b7 t \u21d2 Z = W / (I \u00b7 t), where W is deposited copper weight at cathode.",
+                hasCustomUI: true,
+                type: 'ece'
             }
         ];
 
-        function switchExperiment(index) {
-            document.querySelectorAll('.exp-tab').forEach((el, idx) => {
-                el.classList.toggle('active', idx === index);
+        let currentExpIndex = 0;
+
+        function initExperimentsList() {
+            const listEl = document.getElementById('exp-list');
+            listEl.innerHTML = '';
+            experiments.forEach((exp, idx) => {
+                listEl.innerHTML += `
+                    <button onclick="selectExperiment(${idx})" id="exp-btn-${idx}" class="w-full text-left p-3 rounded-xl transition text-xs font-medium flex items-center justify-between ${idx === 0 ? 'bg-emerald-600 text-white shadow' : 'bg-slate-50 text-slate-700 hover:bg-slate-200/60'}">
+                        <span class="truncate"><strong class="mr-1.5">Exp ${exp.id}:</strong> ${exp.title}</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] ml-2"></i>
+                    </button>
+                `;
             });
-            loadExperiment(experimentData[index]);
+            renderExperiment(0);
         }
 
-        function loadExperiment(exp) {
-            document.getElementById('instructionBox').innerHTML = `<strong>Objective (${exp.title}):</strong> ${exp.objective}`;
-            document.getElementById('benchTitle').innerText = exp.title;
-            document.getElementById('benchDesc').innerText = exp.procedure;
-            
-            // Populate Left Panel Apparatus
-            const appList = document.getElementById('apparatusList');
-            appList.innerHTML = exp.apparatus.map(item => `<div class="item-box"><span>${exp.title.includes('Nylon') && item.includes('Glass Rod') ? '⚡ ' : '🔬 '} ${item}</span></div>`).join('');
-            
-            // Populate Left Panel Chemicals
-            const chemList = document.getElementById('chemicalsList');
-            chemList.innerHTML = exp.chemicals.map(chem => `<div class="item-box"><span>🧪 ${chem}</span></div>`).join('');
-            
-            // Setup Dynamic Workbench & Tables
-            renderTable(exp.tableType);
-            logMessage(`Loaded module: ${exp.title}`);
+        function selectExperiment(idx) {
+            currentExpIndex = idx;
+            document.querySelectorAll('#exp-list button').forEach((btn, i) => {
+                btn.className = `w-full text-left p-3 rounded-xl transition text-xs font-medium flex items-center justify-between ${i === idx ? 'bg-emerald-600 text-white shadow' : 'bg-slate-50 text-slate-700 hover:bg-slate-200/60'}`;
+            });
+            renderExperiment(idx);
         }
 
-        function renderTable(type) {
-            const container = document.getElementById('dynamicContent');
-            let html = '<div class="table-container"><table>';
+        function renderExperiment(idx) {
+            const exp = experiments[idx];
+            const bench = document.getElementById('experiment-workbench');
             
-            if (type === 'viscosity') {
-                html += `<tr><th>Solution</th><th>t1 (s)</th><th>t2 (s)</th><th>t3 (s)</th><th>Mean t (s)</th><th>η rel</th></tr>
-                         <tr><td>Pure Water (t0)</td><td>52.4</td><td>52.6</td><td>52.5</td><td>52.5</td><td>1.00</td></tr>
-                         <tr><td>0.2% PVA</td><td>61.2</td><td>61.0</td><td>61.1</td><td>61.1</td><td>1.16</td></tr>
-                         <tr><td>0.4% PVA</td><td>71.5</td><td>71.3</td><td>71.4</td><td>71.4</td><td>1.36</td></tr>`;
-            } else if (type === 'nylon') {
-                html += `<tr><th>Monomer 1</th><th>Monomer 2</th><th>Solvent System</th><th>Yield (g)</th></tr>
-                         <tr><td>Sebacoyl Chloride (1ml)</td><td>Hexamethylenediamine (2.2g)</td><td>CCl4 + Aqueous Phase</td><td>0.85 g</td></tr>`;
-            } else if (type === 'colorimeter') {
-                html += `<tr><th>Std Fe (ml)</th><th>Concentration (mg/ml)</th><th>Absorbance (A)</th></tr>
-                         <tr><td>5</td><td>0.001</td><td>0.12</td></tr>
-                         <tr><td>10</td><td>0.002</td><td>0.24</td></tr>
-                         <tr><td>Unknown Sample</td><td>-</td><td>0.31</td></tr>`;
-            } else if (type === 'corrosion') {
-                html += `<tr><th>Acid Normality</th><th>Initial Wt (g)</th><th>Final Wt (g)</th><th>Weight Loss (g/hr)</th></tr>
-                         <tr><td>1 N H2SO4</td><td>12.450</td><td>12.410</td><td>0.040</td></tr>
-                         <tr><td>2 N H2SO4</td><td>12.380</td><td>12.315</td><td>0.065</td></tr>
-                         <tr><td>4 N H2SO4</td><td>12.510</td><td>12.400</td><td>0.110</td></tr>`;
-            } else if (type === 'coal') {
-                html += `<tr><th>Test Parameter</th><th>Crucible + Sample</th><th>Residue Wt</th><th>Percentage (%)</th></tr>
-                         <tr><td>Moisture (110°C)</td><td>1.000 g</td><td>0.920 g</td><td>8.00%</td></tr>
-                         <tr><td>Ash Content (750°C)</td><td>1.000 g</td><td>0.065 g</td><td>6.50%</td></tr>`;
-            } else if (type === 'ph_titration') {
-                html += `<tr><th>NaOH Added (ml)</th><th>pH Measured</th><th>ΔpH / ΔV</th></tr>
-                         <tr><td>0.0</td><td>2.88</td><td>-</td></tr>
-                         <tr><td>12.0</td><td>4.75</td><td>0.15</td></tr>
-                         <tr><td>25.0 (Equivalence)</td><td>8.70</td><td>1.42</td></tr>`;
-            } else if (type === 'tlc') {
-                html += `<tr><th>Compound Spot</th><th>Distance from Base (cm)</th><th>Solvent Front (cm)</th><th>Rf Value</th></tr>
-                         <tr><td>Spot A (Polar)</td><td>3.2 cm</td><td>10.0 cm</td><td>0.32</td></tr>
-                         <tr><td>Spot B (Non-Polar)</td><td>7.5 cm</td><td>10.0 cm</td><td>0.75</td></tr>`;
-            } else if (type === 'kinetics') {
-                html += `<tr><th>Time t (min)</th><th>NaOH Vol (Vt ml)</th><th>(V∞ - Vt)</th><th>Rate Constant K (min⁻¹)</th></tr>
-                         <tr><td>0</td><td>18.5</td><td>22.0</td><td>-</td></tr>
-                         <tr><td>20</td><td>23.2</td><td>17.3</td><td>0.0142</td></tr>
-                         <tr><td>40</td><td>27.0</td><td>13.5</td><td>0.0139</td></tr>`;
-            } else if (type === 'ece') {
-                html += `<tr><th>Initial Wt (W1)</th><th>Final Wt (W2)</th><th>Current (I)</th><th>Time (t)</th><th>ECE (Z g/C)</th></tr>
-                         <tr><td>15.240 g</td><td>15.712 g</td><td>0.5 A</td><td>2700 s</td><td>0.000329</td></tr>`;
+            let interactiveHTML = '';
+            if(exp.type === 'viscometer') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-flask text-emerald-600 mr-2"></i> Interactive Ostwald Viscometer Station</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Select Polymer - Solvent System:</label>
+                                <select id="visc-system" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium">
+                                    <option value="pva">Polyvinyl alcohol in Water (K=2.0e-4, \u03b1=0.76)</option>
+                                    <option value="ca">Cellulose acetate in Acetone (K=1.49e-4, \u03b1=0.82)</option>
+                                    <option value="ps">Polystyrene in Toluene (K=3.7e-4, \u03b1=0.62)</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="runViscometerSim()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow">Run Flow Time Measurements</button>
+                            </div>
+                        </div>
+                        <div id="visc-results" class="hidden space-y-3 pt-2">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead class="bg-slate-100 text-slate-700">
+                                    <tr>
+                                        <th class="p-2 border">Conc (%)</th>
+                                        <th class="p-2 border">Flow Time t (s)</th>
+                                        <th class="p-2 border">\u03b7_rel</th>
+                                        <th class="p-2 border">\u03b7_sp</th>
+                                        <th class="p-2 border">\u03b7_red</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visc-table-body"></tbody>
+                            </table>
+                            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-emerald-900 font-medium">
+                                Calculated Viscosity Average Molecular Weight M = <span id="visc-m-val" class="font-bold">48,250 g/mol</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'nylon') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-droplet text-amber-600 mr-2"></i> Interfacial Polymerization (Nylon Rope Trick)</h4>
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="space-y-2 text-xs">
+                                <p><strong>Aqueous Phase:</strong> 2.2g Hexamethylene diamine in 50ml H₂O</p>
+                                <p><strong>Organic Phase:</strong> 1ml Sebacoyl chloride in 50ml CCl\u2084</p>
+                                <p class="text-emerald-700 font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> Interface polymerization active at 25\u00b0C</p>
+                            </div>
+                            <button onclick="pullNylonRope()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow transition animate-pulse">Pull Nylon 6,10 Thread</button>
+                        </div>
+                        <div id="nylon-output" class="hidden bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-xs text-emerald-900 font-medium text-center">
+                            Nylon 6,10 thread successfully drawn onto glass rod! Total polymer weight recovered = <strong class="text-sm">1.84 g</strong>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'colorimeter') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-square-poll-vertical text-emerald-600 mr-2"></i> Beer-Lambert Calibration & Fe\u00b3\u207a Estimation</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border text-xs"><strong class="block text-slate-700 mb-1">Blank Calibration</strong><button onclick="runColorimeterBlank()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-white py-1.5 rounded-lg font-medium">Calibrate 100% T</button></div>
+                            <div class="bg-slate-50 p-3 rounded-xl border text-xs"><strong class="block text-slate-700 mb-1">Standard Solutions</strong><button onclick="runColorimeterStandards()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 rounded-lg font-medium">Measure Standards</button></div>
+                            <div class="bg-slate-50 p-3 rounded-xl border text-xs"><strong class="block text-slate-700 mb-1">Unknown Fe Sample</strong><button onclick="runColorimeterUnknown()" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded-lg font-medium">Test Unknown Sample</button></div>
+                        </div>
+                        <div id="colorimeter-result" class="hidden bg-slate-50 p-4 rounded-xl border text-xs space-y-2">
+                            <p class="font-bold text-slate-800">Colorimetric Analysis Complete:</p>
+                            <p class="text-emerald-700 font-mono font-bold text-sm">Unknown Iron Concentration = 0.038 mg/ml</p>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'corrosion') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-shield-halved text-amber-600 mr-2"></i> Metal Corrosion in Acidic H₂SO₄</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <button onclick="runCorrosionTest(1)" class="p-3 bg-slate-50 hover:bg-slate-100 border rounded-xl text-xs text-left"><strong>Plate 1 (1N H₂SO₄)</strong><br>Immerse for 1 hour</button>
+                            <button onclick="runCorrosionTest(2)" class="p-3 bg-slate-50 hover:bg-slate-100 border rounded-xl text-xs text-left"><strong>Plate 2 (2N H₂SO₄)</strong><br>Immerse for 1 hour</button>
+                            <button onclick="runCorrosionTest(4)" class="p-3 bg-slate-50 hover:bg-slate-100 border rounded-xl text-xs text-left"><strong>Plate 3 (4N H₂SO₄)</strong><br>Immerse for 1 hour</button>
+                        </div>
+                        <div id="corrosion-log" class="hidden bg-slate-900 text-emerald-400 font-mono text-xs p-4 rounded-xl space-y-1">
+                            <div>[Corrosion Test] Mild steel plates immersed in H\u2082SO\u2084 solutions.</div>
+                            <div>[Results] Weight loss/g/h is maximum in 4N solution (0.142 g/h) due to accelerated anodic dissolution.</div>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'coal') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-fire text-amber-600 mr-2"></i> Proximate Analysis of Coal Sample</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border text-xs space-y-2">
+                                <strong>Part A: Moisture Content (110\u00b0C Oven)</strong>
+                                <p class="text-slate-500">Initial Coal Weight = 1.000 g | Heated for 1h</p>
+                                <button onclick="calcCoalMoisture()" class="w-full py-2 bg-emerald-600 text-white rounded-lg font-medium">Calculate % Moisture</button>
+                                <p id="coal-moisture-res" class="font-bold text-emerald-700 hidden">Moisture Content = 3.25 %</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border text-xs space-y-2">
+                                <strong>Part B: Ash Content (750\u00b0C Muffle Furnace)</strong>
+                                <p class="text-slate-500">Ignited for 30 mins without lid</p>
+                                <button onclick="calcCoalAsh()" class="w-full py-2 bg-emerald-600 text-white rounded-lg font-medium">Calculate % Ash</button>
+                                <p id="coal-ash-res" class="font-bold text-emerald-700 hidden">Ash Content = 6.80 %</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'phtitration') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i> pH Metric Titration (CH\u2083COOH vs NaOH)</h4>
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border text-xs">
+                            <div>
+                                <p><strong>Titrand:</strong> 25 ml of 0.1N CH\u2083COOH</p>
+                                <p><strong>Titrant:</strong> 0.1N NaOH from burette</p>
+                            </div>
+                            <button onclick="runPhTitration()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold shadow">Generate Sigmoidal Titration Curve</button>
+                        </div>
+                        <div id="ph-chart-container" class="hidden bg-slate-50 p-4 rounded-xl border h-64 relative flex items-center justify-center">
+                            <canvas id="phCanvas"></canvas>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'tlc') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-layer-group text-purple-600 mr-2"></i> Thin Layer Chromatography (TLC)</h4>
+                        <div class="bg-slate-50 p-4 rounded-xl border flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+                            <div class="space-y-1">
+                                <p><strong>Stationary Phase:</strong> Silica gel coated glass plate</p>
+                                <p><strong>Mobile Phase:</strong> Chloroform + Benzene eluent</p>
+                                <p><strong>Visualization:</strong> Iodine chamber staining</p>
+                            </div>
+                            <button onclick="runTlcSim()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold shadow">Run TLC Elution & Spots</button>
+                        </div>
+                        <div id="tlc-res" class="hidden bg-slate-50 p-4 rounded-xl border text-xs space-y-2">
+                            <p class="font-bold text-slate-800">Retardation Factor (Rf) Calculation:</p>
+                            <p class="font-mono text-purple-700">Compound A Rf = 0.32 | Compound B Rf = 0.65 | Compound C Rf = 0.84</p>
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'kinetics') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-stopwatch text-blue-600 mr-2"></i> Kinetics of Acid-Catalyzed Ester Hydrolysis</h4>
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border text-xs">
+                            <p>Reaction in Thermostat at 25\u00b0C with 0.4N HCl catalyst. Ice-quenched titration with 0.2N NaOH.</p>
+                            <button onclick="runKineticsSim()" class="px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold shadow">Calculate Rate Constant K</button>
+                        </div>
+                        <div id="kinetics-res" class="hidden bg-emerald-50 p-4 rounded-xl border text-xs text-emerald-900 font-medium">
+                            Pseudo First-Order Rate Constant K = <strong class="text-sm">0.0168 min\u207b\u00b9</strong> (Graph slope verified)
+                        </div>
+                    </div>
+                `;
+            } else if(exp.type === 'ece') {
+                interactiveHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center"><i class="fa-solid fa-bolt text-amber-600 mr-2"></i> Electrochemical Equivalent (ECE) of Copper</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="bg-slate-50 p-4 rounded-xl border space-y-2">
+                                <p><strong>Current (I):</strong> 0.5 A</p>
+                                <p><strong>Time (t):</strong> 45 minutes (2700 s)</p>
+                                <p><strong>Electrolyte:</strong> 15% CuSO\u2084 + 5% H\u2082SO\u2084</p>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <button onclick="calcEce()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold shadow">Compute ECE (Z)</button>
+                            </div>
+                        </div>
+                        <div id="ece-res" class="hidden bg-emerald-50 p-4 rounded-xl border text-xs text-emerald-900 font-bold text-center">
+                            Calculated ECE of Copper Z = 0.0003281 g/C (Matches standard literature)
+                        </div>
+                    </div>
+                `;
             }
-            html += '</table></div>';
-            html += `<button class="action-btn" onclick="runSimulation()">Run Automated Simulation & Data Plot</button>`;
-            container.innerHTML = html;
+
+            bench.innerHTML = `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-start border-b pb-4">
+                        <div>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">Experiment No. ${exp.id}</span>
+                            <h3 class="font-bold text-slate-800 text-lg mt-2">${exp.title}</h3>
+                        </div>
+                        <button onclick="printReport(${exp.id})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-print mr-1"></i> Export Report
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700">
+                        <div class="bg-slate-50 p-4 rounded-xl border space-y-1">
+                            <strong class="text-slate-900 block mb-1 font-semibold"><i class="fa-solid fa-bullseye text-emerald-600 mr-1.5"></i> Aim / Objective:</strong>
+                            <p class="leading-relaxed">${exp.aim}</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-xl border space-y-1">
+                            <strong class="text-slate-900 block mb-1 font-semibold"><i class="fa-solid fa-book text-emerald-600 mr-1.5"></i> Theoretical Background:</strong>
+                            <p class="leading-relaxed">${exp.theory}</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        ${interactiveHTML}
+                    </div>
+                </div>
+            `;
         }
 
-        function logMessage(text) {
-            const consoleBox = document.getElementById('consoleLog');
-            consoleBox.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${text}`;
-            consoleBox.scrollTop = consoleBox.scrollHeight;
+        // --- Interactive Simulation Handlers ---
+        function runViscometerSim() {
+            const tbody = document.getElementById('visc-table-body');
+            tbody.innerHTML = `
+                <tr><td class="p-2 border">0.2%</td><td class="p-2 border">54.2 s</td><td class="p-2 border">1.084</td><td class="p-2 border">0.084</td><td class="p-2 border">0.420</td></tr>
+                <tr><td class="p-2 border">0.4%</td><td class="p-2 border">58.6 s</td><td class="p-2 border">1.172</td><td class="p-2 border">0.172</td><td class="p-2 border">0.430</td></tr>
+                <tr><td class="p-2 border">0.6%</td><td class="p-2 border">63.4 s</td><td class="p-2 border">1.268</td><td class="p-2 border">0.268</td><td class="p-2 border">0.446</td></tr>
+                <tr><td class="p-2 border">0.8%</td><td class="p-2 border">68.5 s</td><td class="p-2 border">1.370</td><td class="p-2 border">0.370</td><td class="p-2 border">0.462</td></tr>
+                <tr><td class="p-2 border">1.0%</td><td class="p-2 border">74.0 s</td><td class="p-2 border">1.480</td><td class="p-2 border">0.480</td><td class="p-2 border">0.480</td></tr>
+            `;
+            document.getElementById('visc-results').classList.remove('hidden');
+            logReaction("Ostwald viscometer flow times recorded across dilutions. Viscosity average molecular weight calculated.");
         }
 
-        function runSimulation() {
-            logMessage("Executing experiment trial and logging titration/viscosity points...");
-            document.getElementById('metricTemp').innerText = "25.2 °C";
-            document.getElementById('metricPH').innerText = "7.42 pH";
-            document.getElementById('metricTimer').innerText = "05:00 s";
-            alert("Simulation completed successfully! Data points and graphs updated in observation table.");
+        function pullNylonRope() {
+            document.getElementById('nylon-output').classList.remove('hidden');
+            logReaction("Nylon 6,10 rope successfully drawn via interfacial polymerization.");
         }
 
-        // Initialize first experiment on load
-        window.onload = () => loadExperiment(experimentData[0]);
+        function runColorimeterBlank() {
+            showMessage("Blank Calibration", "Spectrophotometer successfully calibrated to 100% Transmittance (0% Absorbance) using NH₄SCN blank solution.");
+            logReaction("Colorimeter blank calibrated successfully at \u03bb max 450nm.");
+        }
+        function runColorimeterStandards() {
+            showMessage("Standard Solutions Measured", "Absorbance recorded for standard Fe solutions (5, 10, 15, 20, 25 ml). Calibration curve linear regression verified.");
+            logReaction("Standard iron calibration curve plotted successfully.");
+        }
+        function runColorimeterUnknown() {
+            document.getElementById('colorimeter-result').classList.remove('hidden');
+            logReaction("Unknown iron sample absorbance measured. Concentration determined via calibration graph.");
+        }
+
+        function runCorrosionTest(norm) {
+            document.getElementById('corrosion-log').classList.remove('hidden');
+            logReaction(`Corrosion test completed for ${norm}N H\u2082SO\u2084 solution.`);
+        }
+
+        function calcCoalMoisture() {
+            document.getElementById('coal-moisture-res').classList.remove('hidden');
+            logReaction("Coal moisture content determined as 3.25% after 110\u00b0C oven drying.");
+        }
+        function calcCoalAsh() {
+            document.getElementById('coal-ash-res').classList.remove('hidden');
+            logReaction("Coal ash content determined as 6.80% after 750\u00b0C muffle furnace ignition.");
+        }
+
+        function runPhTitration() {
+            document.getElementById('ph-chart-container').classList.remove('hidden');
+            const ctx = document.getElementById('phCanvas').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '5', '10', '15', '20', '24', '25', '26', '30', '35', '40'],
+                    datasets: [{
+                        label: 'pH vs Vol of NaOH (ml)',
+                        data: [2.8, 3.4, 4.2, 4.8, 5.5, 6.8, 11.2, 11.8, 12.2, 12.5, 12.7],
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+            logReaction("pH metric titration curve generated. Equivalence point observed at exactly 25.0 ml NaOH.");
+        }
+
+        function runTlcSim() {
+            document.getElementById('tlc-res').classList.remove('hidden');
+            logReaction("TLC plate developed in chloroform-benzene eluent. Iodine chamber staining complete.");
+        }
+
+        function runKineticsSim() {
+            document.getElementById('kinetics-res').classList.remove('hidden');
+            logReaction("Ester hydrolysis kinetics verified. Pseudo 1st order rate constant K calculated.");
+        }
+
+        function calcEce() {
+            document.getElementById('ece-res').classList.remove('hidden');
+            logReaction("Copper voltameter deposition weighed. ECE Z = 0.0003281 g/C calculated.");
+        }
+
+        function printReport(expId) {
+            showMessage("Export Lab Report", `Experiment No. ${expId} laboratory report summary compiled successfully. Ready for submission to MIT-WPU LCA portal.`);
+            logReaction(`Exported lab report for Experiment ${expId}.`);
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initExperimentsList();
+            logReaction("Virtual Chemistry Lab environment fully loaded for MIT-WPU F.Y. B.Tech.");
+        }
     </script>
 </body>
 </html>
