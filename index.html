@@ -9,12 +9,12 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="badge">CHEM-SIM v1.0</span>
+      <span class="badge">CHEM-SIM v2.0</span>
       <h1>Virtual Chemistry Laboratory</h1>
     </div>
     <nav class="mode-tabs" role="tablist">
       <button id="tab-freestyle" class="tab-btn active" data-mode="freestyle">
-        Mode 1: Freestyle (Grades 9–12)
+        Mode 1: Freestyle Lab (Grades 9–12)
       </button>
       <button id="tab-curriculum" class="tab-btn" data-mode="curriculum">
         Mode 2: MIT-WPU Curriculum (CHM10011)
@@ -24,51 +24,55 @@
   </header>
 
   <main class="lab-grid">
-    <!-- LEFT PANEL: Shelf / Experiment Selector -->
+    <!-- LEFT PANEL: Shelf / Equipment Selector -->
     <aside class="panel left-panel">
       <div id="freestyle-shelf">
-        <h2>Chemicals & Apparatus</h2>
+        <h2>Chemical Inventory</h2>
         <div class="shelf-group">
           <h3>Acids & Bases</h3>
           <div class="chip-grid" id="shelf-acidbase"></div>
         </div>
         <div class="shelf-group">
-          <h3>Salts, Metals & Indicators</h3>
+          <h3>Oxidizing Agents & Salts</h3>
           <div class="chip-grid" id="shelf-salts"></div>
         </div>
         <div class="shelf-group">
-          <h3>Thermal & Stirring Controls</h3>
-          <label class="slider-label">
-            Bunsen Burner Temp: <strong id="temp-display">25 °C</strong>
-            <input type="range" id="temp-slider" min="25" max="250" value="25" />
-          </label>
+          <h3>Metals & Indicators</h3>
+          <div class="chip-grid" id="shelf-metals"></div>
+        </div>
+        <div class="shelf-group tools-group">
+          <h3>Movable Apparatus</h3>
+          <p class="subtext">Drag the Bunsen Burner onto glassware to heat.</p>
+          <div id="draggable-burner" class="draggable-tool" draggable="true">
+            🔥 Bunsen Burner Torch (<span id="burner-temp-label">Off</span>)
+          </div>
           <button id="btn-stir" class="btn-action">Stir Solution</button>
         </div>
       </div>
 
       <div id="curriculum-shelf" class="hidden">
         <h2>MIT-WPU CHM10011 Manual</h2>
-        <p class="subtext">Select an F.Y. B.Tech experiment:</p>
+        <p class="subtext">Select an F.Y. B.Tech experiment[cite: 1, 5]:</p>
         <div id="exp-list" class="exp-list"></div>
       </div>
     </aside>
 
-    <!-- CENTER PANEL: Interactive Apparatus Canvas -->
+    <!-- CENTER PANEL: Interactive Canvas Workspace -->
     <section class="panel center-panel">
       <div class="bench-header">
         <h2 id="bench-title">Freestyle Reaction Beaker (250 mL)</h2>
-        <span id="status-pill" class="status-pill">Ready</span>
+        <span id="status-pill" class="status-pill">System Ready</span>
       </div>
 
-      <div class="canvas-wrapper">
-        <canvas id="lab-canvas" width="540" height="380"></canvas>
+      <div class="canvas-wrapper" id="canvas-dropzone">
+        <canvas id="lab-canvas" width="560" height="380"></canvas>
       </div>
 
-      <!-- Dynamic Experiment Controls (Contextual) -->
+      <!-- Contextual Dynamic Controls -->
       <div id="dynamic-controls" class="dynamic-controls"></div>
     </section>
 
-    <!-- RIGHT PANEL: Procedure, Live Telemetry & Reaction Log -->
+    <!-- RIGHT PANEL: Telemetry, Procedure & Logs -->
     <aside class="panel right-panel">
       <div class="telemetry-grid">
         <div class="metric-card">
